@@ -1,32 +1,42 @@
-import authService from "@/lib/api/services/auth-service";
-import { AuthResponse, LoginRequest } from "@/lib/api/types";
-import { useAuthStore } from "@/store/use-auth-store";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+//LOGIN
+//useMutation: xử lý  các hành động POST,PUT, DELETE
+import {useMutation} from '@tanstack/react-query';
+import {LoginRequest, AuthResponse } from '@/lib/api/types';
+import { useAuthStore } from '@/store/use-auth-store';
+import authService from '@/lib/api/services/auth-service';
+import { toast } from 'sonner';
 import { useRouter } from "next/navigation";
-import { USE_CURRENT_USER_QUERY_KEY } from "./use-current-user";
-import { toast } from "sonner";
 
 export const useLogin = () => {
-    const router = useRouter();
-    const queryClient = useQueryClient();
-    const setUser = useAuthStore((state)=>state.setUser);
+  const setUser = useAuthStore((state) => state.setUser);
+  const router = useRouter();
 
-    return useMutation({
-        mutationFn: (data: LoginRequest) => authService.login(data),
-        onSuccess: (response: AuthResponse) => {
-            setUser(response.data.user, response.data.accessToken);
-            //lưu key vào query, gần giống như redis, lần đầu refresh sẽ lâu nhưng lần hai dò key sẽ nhanh
-            queryClient.setQueryData(USE_CURRENT_USER_QUERY_KEY, { 
-                user: response.data.user
+  return useMutation({
 
-              });
-              
-              toast.success("Đăng nhập thành công!");
-              if (response.data.user.role === "admin") {
-                router.push("/dashboard");
-              } else {
-                router.push("/");
-              }
-        },
-    })
+    //gửi yêu cầu đăng nhậpa
+    mutationFn: (data: LoginRequest) => authService.login(data),
+    //THÀNH CÔNG
+    onSuccess: (response: AuthResponse) =>{
+      console.log(response)
+  const { user, accessToken, refreshToken } = response.data; // Truy cập đúng cấu trúc dữ liệu
+
+      //Lưu thông tin người dùng vào store
+      setUser(user, accessToken, refreshToken);
+// Hiển thị thông báo thành công
+toast.success("Đăng nhập thành công!");
+
+// Chuyển hướng dựa trên role
+if (user.role === 'admin') {
+  router.push('/admin/dashboard');
+} else {
+  router.push('/');
+}
+      toast.success("Đăng nhập thành công!");
+    },
+    //that bai
+    onError: (error) =>{
+      toast.error("Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin!");
+      console.error("lỗi khi đăng nhập:", error);
+    },
+  });
 }

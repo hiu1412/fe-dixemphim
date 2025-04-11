@@ -1,44 +1,19 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-
+import { useMutation } from "@tanstack/react-query";
 import { useAuthStore } from "@/store/use-auth-store";
-import { useRouter } from "next/navigation";
-import { USE_CURRENT_USER_QUERY_KEY } from "./use-current-user";
-import { useRef } from "react";
 import authService from "@/lib/api/services/auth-service";
 
 export const useLogout = () => {
-  const router = useRouter();
-  const queryClient = useQueryClient();
-  const logout = useAuthStore((state) => state.logout);
-  const isLoggingOutRef = useRef(false);
+  const logoutStore = useAuthStore((state) => state.logout);
 
   return useMutation({
-    mutationFn: async () => {
-      if (isLoggingOutRef.current) {
-        console.log("Logout đang được xử lý, bỏ qua request trùng lặp");
-        return Promise.resolve({ status: "success", message: "Already logging out", data: null });
-      }
-      
-      isLoggingOutRef.current = true;
-      
-      try {
-        return await authService.logout();
-      } catch (error) {
-        isLoggingOutRef.current = false;
-        throw error;
-      }
-    },
+    mutationFn: authService.logout,
     onSuccess: () => {
-      queryClient.removeQueries({ queryKey: USE_CURRENT_USER_QUERY_KEY });
-      
-      logout();
-      
-      isLoggingOutRef.current = false;
-      
-      router.push("/");
+      // Cập nhật trạng thái trong store
+      logoutStore();
+      console.log("Đăng xuất thành công!");
     },
-    onError: () => {
-      isLoggingOutRef.current = false;
-    }
+    onError: (error) => {
+      console.error("Lỗi khi đăng xuất:", error);
+    },
   });
 };

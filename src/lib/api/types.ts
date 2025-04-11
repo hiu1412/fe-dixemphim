@@ -1,13 +1,29 @@
+//các interface cần thiết
 export interface LoginRequest{
     email: string;
     password: string;
 }
 
-
 export interface RegisterRequest {
     username: string,
     email: string,
     password: string,
+}
+
+export interface ApiResponse<T = unknown, D = null> {
+  status: 'success' | 'error';
+  message: T;
+  data: D;
+}
+
+export interface AuthResponse {
+  status: "success" | "error";
+  message: string;
+  data: {
+    user: User;
+    accessToken: string;
+    refreshToken: string;
+  };
 }
 
 export interface User {
@@ -20,17 +36,9 @@ export interface User {
     updated_at: string;
   }
 
-  export interface AuthResponse {
-    status: "success" | "error";
-    message: string;
-    data: {
-      user: User;
-      accessToken: string;
-    };
-  }
-
   //moviemovie
   export interface Movie {
+    id: string;
     title: string;
     description: string;
     duration: number;
@@ -40,6 +48,10 @@ export interface User {
     showtime: Showtime[]; // mảng các đối tượng Showtime
     createAt?: Date; // optional, default: Date.now
     updateAt?: Date; // optional, default: Date.now
+}
+
+export interface MovieListResponse {
+  movies: Movie[];
 }
 
 //showtime
@@ -83,6 +95,14 @@ export interface Theatre {
   updateAt?: Date; // optional
 }
 
+export interface ApiErrorResponse {
+  status: string;
+  message: string;
+  errors?: Record<string, string[]>;
+}
 
-
-
+export interface AuthApiResponse<T> {
+  status: "success" | "error"; // Trạng thái phản hồi
+  message: string; // Thông báo từ API
+  data: T; // Dữ liệu trả về (tùy thuộc vào API)
+}
