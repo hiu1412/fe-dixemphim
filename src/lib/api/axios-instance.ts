@@ -121,11 +121,6 @@ axiosInstance.interceptors.response.use(
       } catch (refreshError) {
         processQueue(refreshError, null);
         localStorage.removeItem("access_token");
-
-        if (typeof window !== 'undefined' && !window.location.pathname.includes('/auth/login')) {
-          window.location.href = "/auth/login";
-        }
-
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

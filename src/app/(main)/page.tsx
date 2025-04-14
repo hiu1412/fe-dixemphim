@@ -1,26 +1,28 @@
 import { Carousel } from "@/components/carousel";
+import { AllMovies } from "@/components/movies/AllMovie";
+import { NewestMovies } from "@/components/movies/NewestMovie";
 
 const carouselSlides = [
   {
     id: 1,
     imageUrl:
-      "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?q=80&w=2070",
-    title: "Khám phá các dòng xe mới nhất",
-    description: "Trải nghiệm công nghệ và thiết kế hiện đại",
+      "https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=2050",
+    title: "Trải nghiệm Điện ảnh Tuyệt vời",
+    description: "Thưởng thức những bộ phim mới nhất với chất lượng cao nhất",
   },
   {
     id: 2,
     imageUrl:
-      "https://images.unsplash.com/photo-1583121274602-3e2820c69888?q=80&w=2070",
-    title: "Ưu đãi đặc biệt",
-    description: "Giảm giá lên đến 20% cho các dòng xe cao cấp",
+      "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?q=80&w=2070",
+    title: "Ưu đãi Đặc biệt",
+    description: "Giảm giá cho thành viên mới và các suất chiếu sớm",
   },
   {
     id: 3,
     imageUrl:
-      "https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=2070",
-    title: "Dịch vụ hậu mãi tận tâm",
-    description: "Chăm sóc xe của bạn với đội ngũ chuyên nghiệp",
+      "https://images.unsplash.com/photo-1585647347483-22b66260dfff?q=80&w=2070",
+    title: "Trải nghiệm Thoải mái",
+    description: "Hệ thống rạp hiện đại với ghế ngồi êm ái",
   },
 ];
 
@@ -32,6 +34,18 @@ export default function HomePage() {
         <div className="rounded-xl overflow-hidden">
           <Carousel slides={carouselSlides} />
         </div>
+      </section>
+
+      <section className="container mx-auto px-4">
+        <h2 className="text-2xl font-bold mb-4">Danh sách phim</h2>
+        <AllMovies />
+      </section>
+
+      <section className="container mx-auto px-4">
+        <h2 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white">
+          Phim Mới Nhất 
+        </h2>
+        <NewestMovies />
       </section>
 
       

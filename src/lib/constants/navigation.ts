@@ -46,6 +46,11 @@ export const mainNavItems: NavItem[] = [
       href: "/admin/dashboard",
       icon: LayoutDashboard
     },
+    {
+      title: "Quản lý phim",
+      href: "/admin/movies",
+    },
+    
 
   
   ];

@@ -2,48 +2,27 @@ import { create } from "zustand";
 import { Movie } from "@/lib/api/types";
 
 interface MovieStore {
-  movies: Movie[] | null;
+  // States
+  movies: Movie[];
+  newestMovies: Movie[];
   selectedMovie: Movie | null;
+  
+  // Actions
   setMovies: (movies: Movie[]) => void;
+  setNewestMovies: (movies: Movie[]) => void;
   setSelectedMovie: (movie: Movie | null) => void;
-  addMovie: (movie: Movie) => void;
-  updateMovie: (id: string, updatedMovie: Movie) => void;
-  deleteMovie: (id: string) => void;
+  clearMovies: () => void;
 }
 
 export const useMovieStore = create<MovieStore>((set) => ({
-  // State
-  movies: null,
+  // Initial states
+  movies: [],
+  newestMovies: [],
   selectedMovie: null,
 
   // Actions
-  setMovies: (movies) => {
-    set({ movies });
-  },
-
-  setSelectedMovie: (movie) => {
-    set({ selectedMovie: movie });
-  },
-
-  addMovie: (movie) => {
-    set((state) => ({
-      movies: state.movies ? [...state.movies, movie] : [movie],
-    }));
-  },
-
-  updateMovie: (id, updatedMovie) => {
-    set((state) => ({
-      movies: state.movies?.map((movie) => 
-        movie.id === id ? updatedMovie : movie
-      ) || null,
-      selectedMovie: state.selectedMovie?.id === id ? updatedMovie : state.selectedMovie,
-    }));
-  },
-
-  deleteMovie: (id) => {
-    set((state) => ({
-      movies: state.movies?.filter((movie) => movie.id !== id) || null,
-      selectedMovie: state.selectedMovie?.id === id ? null : state.selectedMovie,
-    }));
-  },
+  setMovies: (movies) => set({ movies }),
+  setNewestMovies: (movies) => set({ newestMovies: movies }),
+  setSelectedMovie: (movie) => set({ selectedMovie: movie }),
+  clearMovies: () => set({ movies: [], newestMovies: [], selectedMovie: null }),
 }));

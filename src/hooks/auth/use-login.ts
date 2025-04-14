@@ -27,7 +27,7 @@ toast.success("Đăng nhập thành công!");
 
 // Chuyển hướng dựa trên role
 if (user.role === 'admin') {
-  router.push('/admin/dashboard');
+  router.push('/dashboard');
 } else {
   router.push('/');
 }

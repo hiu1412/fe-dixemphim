@@ -56,6 +56,7 @@ export interface MovieListResponse {
 
 //showtime
 export interface Showtime {
+  id: string;
   movie: string; // ObjectId của Movie
   screen: string; // ObjectId của Screen
   startTime: Date; // Thời gian bắt đầu
@@ -67,6 +68,7 @@ export interface Showtime {
 
 //screen
 export interface Screen {
+  id: string;
   name: string; // Tên phòng chiếu
   type: string; // Loại phòng chiếu
   capacity: number; // Sức chứa của phòng chiếu
@@ -76,6 +78,7 @@ export interface Screen {
 
 //ghe
 export interface Seat {
+  id: string;
   screen: string; // ObjectId của Screen
   row: string; // Hàng ghế
   number: number; // Số ghế
@@ -87,6 +90,7 @@ export interface Seat {
 
 //raprap
 export interface Theatre {
+  id: string;
   name: string; // Tên rạp
   address: string; // Địa chỉ
   city: string; // Thành phố
@@ -106,3 +110,13 @@ export interface AuthApiResponse<T> {
   message: string; // Thông báo từ API
   data: T; // Dữ liệu trả về (tùy thuộc vào API)
 }
+
+//admin
+export type AdminMovieResponse = ApiResponse<{
+  movies: Movie[];
+  total: number;
+}>;
+
+export type AdminSingleMovieResponse = ApiResponse<{
+  movie: Movie;
+}>;

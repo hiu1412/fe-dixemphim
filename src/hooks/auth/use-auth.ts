@@ -10,12 +10,13 @@ export const useAuth = () => {
   const logout = () => {
     logoutFromStore();
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("access_token");
     document.cookie.split(";").forEach((c) => {
       document.cookie = c
         .replace(/^ +/, "")
         .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
     });
-    router.push("/auth/login");
+    router.push("/");
   };
 
   return {

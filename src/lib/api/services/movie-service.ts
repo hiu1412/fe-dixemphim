@@ -1,52 +1,29 @@
-import { ApiResponse, Movie } from "../types";
-import axiosInstance from "../axios-instance";
+import { axiosInstance } from "../axios-instance";
+import { Movie, ApiResponse } from "../types";
 import { API_ENDPOINTS } from "../endpoints";
 
-class MovieService {
-  async getMovies() {
-    const response = await axiosInstance.get<ApiResponse<string, { movies: Movie[] }>>(
-      API_ENDPOINTS.MOVIES.BASE
-    );
-    return response.data;
-  }
+export const movieService = {
+  getAllMovies: () => {
+    return axiosInstance.get<ApiResponse<string, Movie[]>>(API_ENDPOINTS.MOVIES.BASE);
+  },
 
-  async getMovie(id: string) {
-    const response = await axiosInstance.get<ApiResponse<string, { movie: Movie }>>(
-      API_ENDPOINTS.MOVIES.DETAIL(id)
-    );
-    return response.data;
-  }
+  getById: (id: string) => {
+    return axiosInstance.get<ApiResponse<string, Movie>>(API_ENDPOINTS.MOVIES.DETAIL(id));
+  },
 
-  async getNewestMovies() {
-    const response = await axiosInstance.get<ApiResponse<string, { movies: Movie[] }>>(
-      API_ENDPOINTS.MOVIES.NEWEST
-    );
-    return response.data;
-  }
+  create: (data: Partial<Movie>) => {
+    return axiosInstance.post<ApiResponse<string, Movie>>(API_ENDPOINTS.MOVIES.CREATE, data);
+  },
 
-  async createMovie(data: Partial<Movie>) {
-    const response = await axiosInstance.post<ApiResponse<string, { movie: Movie }>>(
-      API_ENDPOINTS.MOVIES.BASE,
-      data
-    );
-    return response.data;
-  }
+  update: (id: string, data: Partial<Movie>) => {
+    return axiosInstance.put<ApiResponse<string, Movie>>(API_ENDPOINTS.MOVIES.UPDATE(id), data);
+  },
 
-  async updateMovie(id: string, data: Partial<Movie>) {
-    const response = await axiosInstance.put<ApiResponse<string, { movie: Movie }>>(
-      API_ENDPOINTS.MOVIES.UPDATE(id),
-      data
-    );
-    return response.data;
-  }
+  delete: (id: string) => {
+    return axiosInstance.delete<ApiResponse<string, null>>(API_ENDPOINTS.MOVIES.DELETE(id));
+  },
 
-  async deleteMovie(id: string) {
-    const response = await axiosInstance.delete<ApiResponse<string, null>>(
-      API_ENDPOINTS.MOVIES.DELETE(id)
-    );
-    return response.data;
-  }
-}
-
-const movieService = new MovieService();
-export default movieService;
+  getNewest: () => {
+    return axiosInstance.get<ApiResponse<string, Movie[]>>(API_ENDPOINTS.MOVIES.NEWEST);
+  },
+} as const;

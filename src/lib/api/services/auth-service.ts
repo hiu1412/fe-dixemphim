@@ -148,6 +148,29 @@ const authService = {
       }, 300);
     }
   },
+
+  validateAdmin: async (): Promise<AuthApiResponse<{ isAdmin: boolean; user?: User }>> => {
+    try {
+      const response = await axiosInstance.get<AuthApiResponse<{ user: User }>>(API_ENDPOINTS.AUTH.ME);
+      
+      const isAdmin = response.data.data.user?.role === 'admin';
+      
+      return {
+        status: response.data.status,
+        message: response.data.message,
+        data: {
+          isAdmin,
+          user: response.data.data.user
+        }
+      };
+    } catch (error) {
+      return {
+        status: "error",
+        message: "Failed to validate admin rights",
+        data: { isAdmin: false }
+      };
+    }
+  },
 };
 
 export default authService;
