@@ -86,7 +86,6 @@ axiosInstance.interceptors.response.use(
         }, {} as { [key: string]: string });
 
         const refreshToken = cookies['refresh_token'];
-
         if (!refreshToken) {
           throw new Error("No refresh token found");
         }

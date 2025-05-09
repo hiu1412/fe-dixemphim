@@ -6,11 +6,12 @@ import {
   LayoutDashboard,
 } from "lucide-react";
 
+//đảm bảo theo một cấu trúc nhất định 
 interface NavItem {
-    title: string;
-    href: string;
-    icon?: LucideIcon;
-    dropdownItems?: Array<{ title: string; href: string }>;
+    title: string;//tiêu đề chuỗi
+    href: string;//link chuỗi
+    icon?: LucideIcon;// tùy chọnchọn
+    dropdownItems?: Array<{ title: string; href: string }>;//mục con
 }
 
 

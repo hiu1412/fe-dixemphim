@@ -87,7 +87,6 @@ export interface Seat {
   createAt?: Date; // optional
   updateAt?: Date; // optional
 }
-
 //raprap
 export interface Theatre {
   id: string;

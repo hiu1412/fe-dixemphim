@@ -39,3 +39,5 @@ export default function RootProvider({ children }: PropsWithChildren) {
     </QueryClientProvider>
   );
 }
+
+//provider gốc quản lý trạng thái toàn cục cho React gốcgốc

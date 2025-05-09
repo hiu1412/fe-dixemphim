@@ -1,5 +1,6 @@
 "use client"
 
+import { GoogleButton } from "@/components/auth/GoogleButton";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
@@ -35,7 +36,8 @@ export default function LoginPage(){
               </div>
             </div>
           </div>
-    
+          <GoogleButton />
+
         </div>
       );
     }

@@ -6,6 +6,8 @@ export const API_ENDPOINTS = {
     LOGOUT: "/auth/logout",
     REFRESH: "/auth/refresh",  
     ME: "/auth/me",   
+    GOOGLE_LOGIN: "/auth/google",
+    GOOGLE_CALLBACK: "/auth/google/callback",
       },
 
   // User endpoints

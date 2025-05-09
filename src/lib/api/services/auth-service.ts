@@ -171,6 +171,22 @@ const authService = {
       };
     }
   },
-};
 
+
+  //gg 
+  loginWithGoogle: (): void => {
+    // Chuyển hướng người dùng đến backend để xử lý Google OAuth
+    window.location.href = 'http://localhost:4000/auth/google';
+  },
+
+
+handleGoogleCallback: async (): Promise<AuthApiResponse<{user: null, access_token: null}>> => {
+  return {
+    status: "success", 
+    message: "Please use the success route instead",
+    data: { user: null, access_token: null }
+  };
+}
+};
 export default authService;
+

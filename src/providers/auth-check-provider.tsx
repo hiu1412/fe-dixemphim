@@ -46,3 +46,6 @@ export default function AuthCheckProvider({ children }: PropsWithChildren) {
 
   return <>{children}</>;
 }
+
+//Đảm bảo rằng trạng thái người dùng được kiểm tra và cập nhật ngay khi ứng dụng được khởi chạy.
+//Xác định xem người dùng có đang đăng nhập hay không.

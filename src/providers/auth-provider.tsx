@@ -59,3 +59,5 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   return <>{children}</>;
 }
+
+//quản lý trạng thái trong suốt ứng dụng, giải quyết refreshToken nếu cầncần
