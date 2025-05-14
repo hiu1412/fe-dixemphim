@@ -1,3 +1,4 @@
+import { useAuthStore } from "@/store/use-auth-store";
 import axios from "axios";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
@@ -18,12 +19,13 @@ const NO_REFRESH_ENDPOINTS = [
   "/auth/refresh-token"
 ];
 
-// Gắn token vào header cho mỗi request
+// Gắn accessToken lấy từ ram vào header cho mỗi request
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("access_token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const accessToken = useAuthStore.getState().accessToken;
+    if (accessToken) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${accessToken}`;
     }
     return config;
   },
@@ -109,7 +111,6 @@ axiosInstance.interceptors.response.use(
           throw new Error("Invalid refresh token response");
         }
 
-        localStorage.setItem("access_token", newAccessToken);
 
         // Cập nhật token cho request hiện tại và các request trong hàng đợi
         axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${newAccessToken}`;

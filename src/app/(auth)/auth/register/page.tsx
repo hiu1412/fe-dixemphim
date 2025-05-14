@@ -1,5 +1,6 @@
 "use client"
 
+import { GoogleButton } from "@/components/auth/GoogleButton";
 import { RegisterForm } from "@/components/auth/RegisterForm";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
@@ -34,7 +35,7 @@ export default function RegisterPage() {
                     </div>
                 </div>
             </div>
-
+<GoogleButton />
         </div>
     );
 }

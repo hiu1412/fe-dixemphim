@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import authService from "@/lib/api/services/auth-service";
 import { PropsWithChildren } from "react";
 
+//chuyển hướng hoặc load lại trang nhờ AuthProvider check xem người udngf danh oh 
 export function AuthProvider({ children }: PropsWithChildren) {
   const { setUser, user } = useAuthStore();
 

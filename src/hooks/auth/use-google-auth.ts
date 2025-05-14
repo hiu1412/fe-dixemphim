@@ -18,21 +18,23 @@ export const useGoogleAuth = () => {
 
   const handleGoogleCallback = async () => {
     if (isRedirecting) return; // Ngăn chặn nếu đang xử lý yêu cầu khác
-
+  setIsRedirecting(true);
     try {
 
     const searchParams = new URLSearchParams(window.location.search);
     const accessToken = searchParams.get("accessToken");
 
+
     if (!accessToken) {
       throw new Error("Không tìm thấy access token trong URL");
     }
+     setUser({} as any, accessToken, ""); // user tạm thời, hoặc tạo hàm setAccessToken riêng
 
-    // Lưu accessToken vào localStorage
-    localStorage.setItem("access_token", accessToken);
 
+      // luu vao 
+      
       // Gọi API getMe để lấy thông tin người dùng
-      setIsRedirecting(true); // Đặt trạng thái đang chuyển hướng
+     // Đặt trạng thái đang chuyển hướng
       const response = await authService.getMe();
       const user = response.data.user;
   

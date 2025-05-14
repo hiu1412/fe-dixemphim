@@ -8,46 +8,44 @@ import { axiosInstance } from "../axios-instance";
 import { AuthResponse, LoginRequest, RegisterRequest, User } from "../types";
 
 
-export interface AuthApiResponse<T>{
+export interface AuthApiResponse<T> {
   status: "success" | "error";
   message: string;
   data: T;
 }
 
 //Luuu thong tin vao localStorage va cookie
-const setUserAuthenticated = (accessToken: string, refreshToken: string, user: User) => {
+const setUserAuthenticated = (refreshToken: string, user: User) => {
   if (!user) {
     console.error("User object is undefined");
     return;
   }
 
   // Lưu tokens vào cookies để middleware có thể truy cập
-  Cookies.set("accessToken", accessToken, {expires: 30, path: "/" });
-  Cookies.set("refresh_token", refreshToken, {expires: 30, path: "/" });
-  Cookies.set("user-role", user?.role || "user", {expires: 30, path: "/" });
+  Cookies.set("refresh_token", refreshToken, { expires: 30, path: "/" });
+  Cookies.set("user-role", user?.role || "user", { expires: 30, path: "/" });
 
   // Lưu accessToken vào localStorage để client có thể sử dụng
-  localStorage.setItem("accessToken", accessToken);
 };
 
 //xoa thong tin xac thuc
 const clearUserAuthentication = () => {
   // Xóa từ localStorage
-  localStorage.removeItem("accessToken");
-  
+
+
   // Xóa từ cookies
-  Cookies.remove("accessToken", {path: "/"});
-  Cookies.remove("refresh_token", {path: "/"});
-  Cookies.remove("user-role", {path: "/"});
+  
+  Cookies.remove("refresh_token", { path: "/" });
+  Cookies.remove("user-role", { path: "/" });
 };
 
 // Biến cờ để kiểm tra xem có yêu cầu xác thực đang diễn ra hay không
-let isMakingAuthRequest = false; 
+let isMakingAuthRequest = false;
 
 const authService = {
   //DANG NHAP
-  login: async(data: LoginRequest): Promise<AuthResponse> =>{
-    try{
+  login: async (data: LoginRequest): Promise<AuthResponse> => {
+    try {
       const response = await axiosInstance.post<AuthResponse>(API_ENDPOINTS.AUTH.LOGIN, data);
 
       if (!response.data) {
@@ -63,29 +61,29 @@ const authService = {
       }
 
       // Lưu thông tin xác thực
-      if (user && accessToken && refreshToken) {
-        setUserAuthenticated(accessToken, refreshToken, user);
+      if (user  && refreshToken) {
+        setUserAuthenticated( refreshToken, user);
       } else {
         throw new Error("Missing required authentication data");
       }
 
       return response.data;
-    }catch(error){
+    } catch (error) {
       throw error;
     }
   },
 
   //Đăng ký 
-  register: async(data: RegisterRequest): Promise<AuthResponse> =>{
+  register: async (data: RegisterRequest): Promise<AuthResponse> => {
     const response = await axiosInstance.post<AuthResponse>(API_ENDPOINTS.AUTH.REGISTER, data);
     return response.data;
   },
 
   //Đăng xuất
-  logout: async (): Promise<AuthApiResponse<null>> =>{
+  logout: async (): Promise<AuthApiResponse<null>> => {
     //kiem tra xem co yeu cau nao dang dien ra hay khong
     //yeu cau dang xuat dang dien ra
-    if(isMakingAuthRequest){
+    if (isMakingAuthRequest) {
       console.log("Auth Service - Logout: Another request is in progress. Please wait.");
       return {
         status: "success",
@@ -94,9 +92,9 @@ const authService = {
       };
     }
     isMakingAuthRequest = true;
-    
+
     //gui yeu cau dang xuat den server
-    try{
+    try {
       console.log("Auth Service - Logout: Logging out...");
       const response = await axiosInstance.post<AuthApiResponse<null>>(API_ENDPOINTS.AUTH.LOGOUT);
       console.log("Auth Service - Logout: Logout successful", response.data);
@@ -104,11 +102,11 @@ const authService = {
       //xóa thông tin xác thực
       clearUserAuthentication();
       return response.data;
-    }catch(error){
+    } catch (error) {
       console.error("Auth Service - Logout: Logout failed", error);
       throw error;
-    }finally{
-      setTimeout(() =>{
+    } finally {
+      setTimeout(() => {
         isMakingAuthRequest = false;
       }, 300);
     }
@@ -152,9 +150,9 @@ const authService = {
   validateAdmin: async (): Promise<AuthApiResponse<{ isAdmin: boolean; user?: User }>> => {
     try {
       const response = await axiosInstance.get<AuthApiResponse<{ user: User }>>(API_ENDPOINTS.AUTH.ME);
-      
+
       const isAdmin = response.data.data.user?.role === 'admin';
-      
+
       return {
         status: response.data.status,
         message: response.data.message,
@@ -173,20 +171,44 @@ const authService = {
   },
 
 
-  //gg 
+  //login google
   loginWithGoogle: (): void => {
     // Chuyển hướng người dùng đến backend để xử lý Google OAuth
     window.location.href = 'http://localhost:4000/auth/google';
   },
 
 
-handleGoogleCallback: async (): Promise<AuthApiResponse<{user: null, access_token: null}>> => {
-  return {
-    status: "success", 
-    message: "Please use the success route instead",
-    data: { user: null, access_token: null }
-  };
-}
+  handleGoogleCallback: async (): Promise<AuthApiResponse<{ user: null, access_token: null }>> => {
+    return {
+      status: "success",
+      message: "Please use the success route instead",
+      data: { user: null, access_token: null }
+    };
+  },
+
+  requestEmail: async(email:string): Promise<AuthApiResponse<null>> => {
+    try{
+      const response = await axiosInstance.post<AuthApiResponse<null>>(API_ENDPOINTS.AUTH.EMAIL_REQUEST, { email });
+      return response.data;
+    }catch(error){
+      console.error("Error requesting password reset:", error);
+      throw error;
+    }
+  },
+
+  resetPasswordEmail: async (token: string, newPassword: string): Promise<AuthApiResponse<null>> => {
+    try {
+      const response = await axiosInstance.post<AuthApiResponse<null>>(
+        API_ENDPOINTS.AUTH.EMAIL_RESET(token),
+        { newPassword }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Auth Service - Reset Password: Failed", error);
+      throw error;
+    }
+  },
 };
+
 export default authService;
 

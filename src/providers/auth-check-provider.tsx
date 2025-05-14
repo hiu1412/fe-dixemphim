@@ -22,9 +22,9 @@ export default function AuthCheckProvider({ children }: PropsWithChildren) {
         const response = await authService.getMe();
         console.log("GetMe response:", response); // Log để debug
 
-        if (response.data && response.data.user) {
-          const accessToken = localStorage.getItem("access_token") || "";
-          const refreshToken = document.cookie
+        if (response.data && response.data.user) {//nếu có phản hồi về người dùng
+          const accessToken = localStorage.getItem("access_token") || "";// Lấy access token từ localStorage
+          const refreshToken = document.cookie // Lấy refresh token từ cookie
             .split("; ")
             .find((row) => row.startsWith("refresh_token="))
             ?.split("=")[1] || "";

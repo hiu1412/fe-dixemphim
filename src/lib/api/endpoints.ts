@@ -8,6 +8,8 @@ export const API_ENDPOINTS = {
     ME: "/auth/me",   
     GOOGLE_LOGIN: "/auth/google",
     GOOGLE_CALLBACK: "/auth/google/callback",
+    EMAIL_REQUEST:"/email/request-reset-password",
+    EMAIL_RESET:(token: string) =>`/auth/reset-password/${token}`,
       },
 
   // User endpoints
