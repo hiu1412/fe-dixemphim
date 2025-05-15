@@ -36,57 +36,10 @@ export interface User {
     updated_at: string;
   }
 
-  //moviemovie
-  export interface Movie {
-    id: string;
-    title: string;
-    description: string;
-    duration: number;
-    poster?: string; // optional
-    director: string;
-    rating: number;
-    showtime: Showtime[]; // mảng các đối tượng Showtime
-    createAt?: Date; // optional, default: Date.now
-    updateAt?: Date; // optional, default: Date.now
-}
 
-export interface MovieListResponse {
-  movies: Movie[];
-}
 
-//showtime
-export interface Showtime {
-  id: string;
-  movie: string; // ObjectId của Movie
-  screen: string; // ObjectId của Screen
-  startTime: Date; // Thời gian bắt đầu
-  endTime: Date; // Thời gian kết thúc
-  price: number; // Giá vé
-  createAt?: Date; // optional
-  updateAt?: Date; // optional
-}
 
-//screen
-export interface Screen {
-  id: string;
-  name: string; // Tên phòng chiếu
-  type: string; // Loại phòng chiếu
-  capacity: number; // Sức chứa của phòng chiếu
-  createAt?: Date; // optional
-  updateAt?: Date; // optional
-}
 
-//ghe
-export interface Seat {
-  id: string;
-  screen: string; // ObjectId của Screen
-  row: string; // Hàng ghế
-  number: number; // Số ghế
-  type: "normal" | "vip"; // Loại ghế
-  isAvailable: boolean; // Trạng thái ghế
-  createAt?: Date; // optional
-  updateAt?: Date; // optional
-}
 //raprap
 export interface Theatre {
   id: string;
@@ -110,12 +63,5 @@ export interface AuthApiResponse<T> {
   data: T; // Dữ liệu trả về (tùy thuộc vào API)
 }
 
-//admin
-export type AdminMovieResponse = ApiResponse<{
-  movies: Movie[];
-  total: number;
-}>;
 
-export type AdminSingleMovieResponse = ApiResponse<{
-  movie: Movie;
-}>;
+

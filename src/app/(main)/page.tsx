@@ -1,7 +1,4 @@
 import { Carousel } from "@/components/carousel";
-import { AllMovies } from "@/components/movies/AllMovie";
-import { NewestMovies } from "@/components/movies/NewestMovie";
-
 const carouselSlides = [
   {
     id: 1,
@@ -25,7 +22,6 @@ const carouselSlides = [
     description: "Hệ thống rạp hiện đại với ghế ngồi êm ái",
   },
 ];
-
 export default function HomePage() {
   return (
     <div className="flex flex-col gap-12">
@@ -35,20 +31,6 @@ export default function HomePage() {
           <Carousel slides={carouselSlides} />
         </div>
       </section>
-
-      <section className="container mx-auto px-4">
-        <h2 className="text-2xl font-bold mb-4">Danh sách phim</h2>
-        <AllMovies />
-      </section>
-
-      <section className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white">
-          Phim Mới Nhất 
-        </h2>
-        <NewestMovies />
-      </section>
-
-      
     </div>
   );
 }

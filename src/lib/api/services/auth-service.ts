@@ -14,7 +14,7 @@ export interface AuthApiResponse<T> {
   data: T;
 }
 
-//Luuu thong tin vao localStorage va cookie
+//Luuu thong tin vao cookie
 const setUserAuthenticated = (refreshToken: string, user: User) => {
   if (!user) {
     console.error("User object is undefined");
