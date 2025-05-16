@@ -21,8 +21,8 @@ export const mainNavItems: NavItem[] = [
       href: "/"
     },
     {
-      title: "Phim mới",
-      href: "/movies"
+      title: "Nhạc Mới",
+      href: "/product"
     },
   ];
 

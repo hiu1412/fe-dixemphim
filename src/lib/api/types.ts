@@ -36,6 +36,20 @@ export interface User {
     updated_at: string;
   }
 
+  export interface Product {
+  _id: string;
+  name: string;
+  image: string;
+  description: string;
+  price: number;
+  quantity: number;
+  artists: string[]; // hoặc Artist[]
+  genres: string[];  // hoặc Genre[]
+  createdAt: string;
+  updatedAt: string;
+}
+
+
 
 
 

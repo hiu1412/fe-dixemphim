@@ -49,7 +49,8 @@ export default function AuthLayout({
                   stiffness: 200,
                 }}
               >
-                DIXEMPHIM
+                DINGHENHAC
+                <span className="text-primary">.</span>
               </motion.h1>
               <motion.div
                 className="h-1 w-20 mx-auto mt-2 bg-gradient-to-r from-transparent via-primary to-transparent"

@@ -17,7 +17,7 @@ export function Header() {
         <div className="flex gap-6 md:gap-10">
           {/* Logo */}
           <Link href="/" className="hidden md:flex items-center space-x-2 pl-2">
-            <span className="hidden font-bold sm:inline-block">DIXEMPHIM</span>
+            <span className="hidden font-bold sm:inline-block">DINGHENHAC</span>
           </Link>
 
           {/* Main Navigation */}

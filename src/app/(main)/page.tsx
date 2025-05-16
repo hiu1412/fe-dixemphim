@@ -1,9 +1,10 @@
 import { Carousel } from "@/components/carousel";
+import NewestProduct from "@/components/product/NewestProduct";
 const carouselSlides = [
   {
     id: 1,
     imageUrl:
-      "https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=2050",
+      "https://i.pinimg.com/736x/7f/40/14/7f40147f3b0b18d754e0308b82ea7e02.jpg",
     title: "Trải nghiệm Điện ảnh Tuyệt vời",
     description: "Thưởng thức những bộ phim mới nhất với chất lượng cao nhất",
   },
@@ -29,6 +30,11 @@ export default function HomePage() {
       <section className="container mx-auto px-4 pt-6">
         <div className="rounded-xl overflow-hidden">
           <Carousel slides={carouselSlides} />
+        </div>
+      </section>
+<section className="container mx-auto px-4 pt-6">
+        <div className="rounded-xl overflow-hidden">
+          < NewestProduct/>
         </div>
       </section>
     </div>

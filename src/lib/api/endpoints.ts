@@ -20,6 +20,14 @@ export const API_ENDPOINTS = {
     DELETE: (id: string) => `/user/${id}`,
   },
 
-  
+  PRODUCT: {
+    BASE: "/product/",
+    DETAIL: (id: string) => `/product/${id}`,
+    UPDATE: (id: string) => `/product/${id}`,
+    DELETE: (id: string) => `/product/${id}`,
+    CREATE: "/product/",
+    LIST: "/product/",
+    NEWEST: "/product/newest",
+  }
   
 }as const
