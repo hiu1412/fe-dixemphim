@@ -1,3 +1,4 @@
+import ArtistList from "@/components/artist/ArtistList";
 import { Carousel } from "@/components/carousel";
 import NewestProduct from "@/components/product/NewestProduct";
 const carouselSlides = [
@@ -5,8 +6,8 @@ const carouselSlides = [
     id: 1,
     imageUrl:
       "https://i.pinimg.com/736x/7f/40/14/7f40147f3b0b18d754e0308b82ea7e02.jpg",
-    title: "Trải nghiệm Điện ảnh Tuyệt vời",
-    description: "Thưởng thức những bộ phim mới nhất với chất lượng cao nhất",
+    title: "Âm nhạc luôn trong tim",
+    description: "Âm nhạc kết nối mọi người lại với nhau",
   },
   {
     id: 2,
@@ -32,11 +33,19 @@ export default function HomePage() {
           <Carousel slides={carouselSlides} />
         </div>
       </section>
-<section className="container mx-auto px-4 pt-6">
+      
+      <section className="container mx-auto px-4 pt-6">
         <div className="rounded-xl overflow-hidden">
           < NewestProduct/>
         </div>
       </section>
+
+      <section className="container mx-auto px-4 pt-6">
+        <div className="rounded-xl overflow-hidden">
+          <ArtistList/>
+        </div>
+      </section>
+
     </div>
   );
 }

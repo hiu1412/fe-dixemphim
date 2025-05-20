@@ -24,6 +24,10 @@ export const mainNavItems: NavItem[] = [
       title: "Nhạc Mới",
       href: "/product"
     },
+    {
+  title: "Nghệ Sĩ",
+  href: "/artist",
+}
   ];
 
 

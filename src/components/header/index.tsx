@@ -6,10 +6,13 @@ import { ThemeToggle } from "../theme-toggle";
 import { Navbar } from "./navbar";
 import { Button } from "../ui/button";
 import { UserButton } from "./user-button";
-import { SearchIcon } from "lucide-react";
+import { SearchIcon, ShoppingCart } from "lucide-react";
+import { useCartStore } from "@/store/cart-store";
 
 export function Header() {
   const { isAuthenticated, logout, user } = useAuth();
+  const cartItemsCount = useCartStore(state => state.getItemsCount());
+
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -30,6 +33,16 @@ export function Header() {
             {/* Search Button */}
             <Button variant="ghost" size="icon" className="hidden md:flex">
               <SearchIcon className="h-5 w-5" />
+            </Button>
+            <Button variant="ghost" size="icon" className="hidden md:flex relative" asChild>
+              <Link href="/cart">
+                <ShoppingCart className="h-5 w-5" />
+                {cartItemsCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {cartItemsCount}
+                  </span>
+                )}
+              </Link>
             </Button>
 
             {/* Theme Toggle */}

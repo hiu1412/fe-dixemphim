@@ -14,6 +14,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
   accessToken: null,
   isAuthenticated: false,
 
+  //sau khi đăng nhập thành công, lưu thông tin người dùng và token vào store
   setUser: (user, accessToken, refreshToken) => {
     // Lưu token vào localStorage và cookies
     if (typeof window !== 'undefined') {
@@ -22,6 +23,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
       document.cookie = `user-role=${user.role || 'user'}; path=/; max-age=${30 * 24 * 60 * 60}`;
     }
 
+    //lưu trạng thái người dùngdùng
     set({
       user,
       accessToken,

@@ -30,7 +30,6 @@ const setUserAuthenticated = (refreshToken: string, user: User) => {
 
 //xoa thong tin xac thuc
 const clearUserAuthentication = () => {
-  // Xóa từ localStorage
 
 
   // Xóa từ cookies

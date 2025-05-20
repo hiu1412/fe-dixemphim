@@ -43,27 +43,21 @@ export interface User {
   description: string;
   price: number;
   quantity: number;
-  artists: string[]; // hoặc Artist[]
-  genres: string[];  // hoặc Genre[]
+  artists: (string | Artist)[]; 
+  genres: string[];  
   createdAt: string;
   updatedAt: string;
 }
 
-
-
-
-
-
-//raprap
-export interface Theatre {
-  id: string;
-  name: string; // Tên rạp
-  address: string; // Địa chỉ
-  city: string; // Thành phố
-  screen: string[]; // Mảng ObjectId của Screen
-  createAt?: Date; // optional
-  updateAt?: Date; // optional
+export interface Artist {
+  _id: string;
+  name: string; 
+  image: string; 
+  description: string; 
+  createAt?: Date;
+  updateAt?: Date; 
 }
+
 
 export interface ApiErrorResponse {
   status: string;
@@ -77,5 +71,91 @@ export interface AuthApiResponse<T> {
   data: T; // Dữ liệu trả về (tùy thuộc vào API)
 }
 
+//cart
+
+export interface CartItem {
+  product: string;
+  price: number;
+  quantity: number;
+  productName: string,
+  productImage: string;
+}
+
+export interface Cart{
+  _id: string;
+  user: string;
+  items: CartItem[];
+  totalAmount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+//Order
+export type OrderStatus = "pending" | "processing" | "completed" | "cancelled";
+
+export interface OrderItem {
+  product: string;
+  quantity: number;
+  price: number;
+  productName: string;
+  productImage: string;
+}
+
+export interface Order {
+  _id?: string;
+  user: string;
+  items: OrderItem[];
+  totalAmount: number;
+  status: OrderStatus;
+  createdAt: string;
+  updatedAt: string;
+}
 
 
+//api request và response
+//request thêm vào giỏ hàng
+
+export interface AddToCartRequest {
+  productId: string;
+  quantity: number;
+}
+
+//Request cập nhật giỏ hàng
+export interface UpdateCartRequest{
+  productId: string;
+  quantity: number;
+}
+
+export interface CreateOrderRequest {
+  // Có thể trống vì sẽ dùng giỏ hàng hiện tại của user
+}
+
+export interface UpdateOrderStatusRequest {
+  status: OrderStatus;
+}
+
+export interface CartResponse {
+  success: boolean; // Hoặc status: "success" | "error" để khớp với API của bạn
+  message?: string;
+  data: Cart;
+}
+
+// Order response
+export interface OrderResponse {
+  success: boolean; // Hoặc status: "success" | "error" để khớp với API của bạn
+  message?: string;
+  data: Order;
+}
+
+export interface OrdersListResponse {
+  success: boolean;
+  message?: string;
+  data: Order[];
+}
+
+export interface SyncCartRequest {
+  items: {
+    productId: string;
+    quantity: number;
+  }[];
+}

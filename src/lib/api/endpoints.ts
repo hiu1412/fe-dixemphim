@@ -28,6 +28,33 @@ export const API_ENDPOINTS = {
     CREATE: "/product/",
     LIST: "/product/",
     NEWEST: "/product/newest",
-  }
+  },
   
+  ARTIST: {
+    BASE: "/artist/",
+    DETAIL: (id: string) => `/artist/${id}`,
+    UPDATE: (id: string) => `/artist/${id}`,
+    DELETE: (id: string) => `/artist/${id}`,
+    CREATE: "/artist/",
+    LIST: "/artist/",
+    PRODUCTS: (id: string) => `/artist/${id}/products`,
+  },
+
+  CART:{
+    BASE: "/cart/",
+    GET:"/cart",
+    ADD: "/cart/",
+    UPDATE:"/cart",
+    REMOVE: (id: string) => `/cart/${id}`,
+    CLEAR: "/cart/clear",
+    SYNC: "/cart/sync",
+    
+  },
+
+  ORDER:{
+    BASE: "/order/",
+    CREATE: "/order/",
+    CANCEL: (id: string) => `/cancel/${id}`,
+    
+  }
 }as const
