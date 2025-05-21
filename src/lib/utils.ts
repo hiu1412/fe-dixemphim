@@ -1,21 +1,18 @@
-import { type ClassValue, clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
-import { useSearchParams} from "react-router-dom"
-
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
-export const useQueryString = () => {
-  const [searchParams] = useSearchParams()
-  const searchParamsObject = Object.fromEntries([...searchParams])
-  return searchParamsObject
-}
-
-export function formatPrice(price: number): string {
+export function formatPrice(price: number) {
   return new Intl.NumberFormat('vi-VN', {
     style: 'currency',
-    currency: 'VND'
+    currency: 'VND',
   }).format(price);
+}
+
+export function isValidObjectId(id: string) {
+  const objectIdPattern = /^[0-9a-fA-F]{24}$/;
+  return objectIdPattern.test(id);
 }

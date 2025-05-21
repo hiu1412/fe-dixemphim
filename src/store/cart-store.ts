@@ -1,80 +1,140 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { CartItem } from '@/lib/api/types';
+import type { Cart, CartItem } from '@/lib/api/types';
 import { cartService } from '@/lib/api/services/cart-service';
+import { AxiosError } from 'axios';
 
-interface CartState {
-  items: CartItem[];
-  totalAmount: number;
-  addItem: (product: any, quantity?: number) => void;
+interface CartState extends Omit<Cart, '_id' | 'user'> {
+  _id: string;
+  user: string;
+  addItem: (product: { _id: string, price: number, name: string, image: string }, quantity?: number) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   removeItem: (productId: string) => void;
   clearCart: () => void;
   getItemsCount: () => number;
   isItemInCart: (productId: string) => boolean;
-  syncCartWithServer: (userId: string) => Promise<void>; // Thêm hàm mới
+  syncCartWithServer: () => Promise<void>;
 }
 
 export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
+      _id: '',
+      user: '',
       items: [],
       totalAmount: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
 
-      // Thêm sản phẩm vào giỏ
       addItem: (product, quantity = 1) => {
-        // ...existing code...
+        set((state) => {
+          const existingItem = state.items.find(
+            item => item.product === product._id
+          );
+
+          const items = existingItem
+            ? state.items.map((item) =>
+                item.product === product._id
+                  ? { ...item, quantity: item.quantity + quantity }
+                  : item
+              )
+            : [...state.items, {
+                product: product._id,
+                price: product.price,
+                quantity,
+                productName: product.name,
+                productImage: product.image
+              }];
+
+          return {
+            ...state,
+            items,
+            totalAmount: items.reduce((total, item) => total + (item.price * item.quantity), 0),
+            updatedAt: new Date().toISOString()
+          };
+        });
       },
 
-      // Cập nhật số lượng
       updateQuantity: (productId, quantity) => {
-        // ...existing code...
+        set((state) => {
+          const items = state.items.map((item) =>
+            item.product === productId ? { ...item, quantity } : item
+          );
+
+          return {
+            ...state,
+            items,
+            totalAmount: items.reduce((total, item) => total + (item.price * item.quantity), 0),
+            updatedAt: new Date().toISOString()
+          };
+        });
       },
 
-      // Xóa sản phẩm
       removeItem: (productId) => {
-        // ...existing code...
+        set((state) => {
+          const items = state.items.filter((item) => item.product !== productId);
+          return {
+            ...state,
+            items,
+            totalAmount: items.reduce((total, item) => total + (item.price * item.quantity), 0),
+            updatedAt: new Date().toISOString()
+          };
+        });
       },
 
-      // Xóa toàn bộ giỏ hàng
       clearCart: () => {
-        set({ items: [], totalAmount: 0 });
+        set((state) => ({
+          ...state,
+          items: [],
+          totalAmount: 0,
+          updatedAt: new Date().toISOString()
+        }));
       },
 
-      // Đếm số lượng items trong giỏ
       getItemsCount: () => {
         return get().items.reduce((count, item) => count + item.quantity, 0);
       },
-      
-      // Kiểm tra sản phẩm có trong giỏ không
+
       isItemInCart: (productId) => {
         return get().items.some(item => item.product === productId);
       },
 
-      // Đồng bộ giỏ hàng với server khi đăng nhập
-       syncCartWithServer: async (userId: string) => {
+      syncCartWithServer: async () => {
         try {
-          const currentCart = get().items;
+          const { items } = get();
           
-          if (currentCart.length > 0) {
-            // Gọi service để đồng bộ với server
-            const mergedCart = await cartService.syncCart(userId, currentCart);
+          if (items.length > 0) {
+            console.log('Cart items before sync:', items);
             
-            // Cập nhật store với dữ liệu từ server
-            set({ 
-              items: mergedCart.items || [], 
-              totalAmount: mergedCart.totalAmount || 0 
+            const syncItems = items.map(item => ({
+              productId: item.product,
+              quantity: item.quantity
+            }));
+
+            console.log('Sync items to send:', syncItems);
+            await cartService.syncCart(syncItems);
+
+            set({
+              _id: '',
+              user: '',
+              items: [],
+              totalAmount: 0,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString()
             });
-            
-            console.log('Đã đồng bộ giỏ hàng thành công');
           }
         } catch (error) {
-          console.error('Lỗi khi đồng bộ giỏ hàng:', error);
+          if (error instanceof AxiosError) {
+            console.error('Lỗi khi đồng bộ giỏ hàng:', error.message);
+            if (error.response?.data) {
+              console.error('Server error:', error.response.data);
+            }
+          }
         }
       }
     }),
     {
-      name: 'shopping-cart', // tên key trong localStorage
+      name: 'shopping-cart',
     }
   )
 );

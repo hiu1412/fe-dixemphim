@@ -1,16 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useCartStore } from "@/store/cart-store";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Minus, Plus, X } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
+import { useCart } from "@/hooks/queries/cart/use-cart";
+import { useAuth } from "@/hooks/auth/use-auth";
 
 export default function CartPage() {
-  // Lấy dữ liệu từ cart store
-  const { items, totalAmount, updateQuantity, removeItem } = useCartStore();
+  const { isAuthenticated } = useAuth();
+  const { cart, updateCart, removeCart } = useCart();
   
   // State để tránh lỗi hydration
   const [isClient, setIsClient] = useState(false);
@@ -24,8 +26,43 @@ export default function CartPage() {
     return null;
   }
 
+  // Handler cho update quantity
+  const handleUpdateQuantity = (productId: string, newQuantity: number) => {
+    if (newQuantity > 0 && cart) {
+      console.log('Updating quantity:', { productId, newQuantity });
+      try {
+        updateCart({
+          productId,
+          quantity: newQuantity
+        });
+      } catch (error) {
+        console.error("Error updating cart:", error);
+      }
+    }
+  };
+
+  // Handler cho remove item
+  const handleRemoveItem = (productId: string) => {
+    if (!productId) return;
+    
+    console.log('Removing item:', productId);
+    try {
+      removeCart(productId);
+    } catch (error) {
+      console.error("Error removing item:", error);
+    }
+  };
+
+  // Handler cho input change
+  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>, productId: string) => {
+    const value = parseInt(e.target.value);
+    if (!isNaN(value) && value > 0) {
+      handleUpdateQuantity(productId, value);
+    }
+  };
+
   // Nếu giỏ hàng trống
-  if (!items.length) {
+  if (!cart || !cart.items?.length) {
     return (
       <div className="container py-16 text-center">
         <h1 className="text-2xl font-bold mb-4">Giỏ hàng</h1>
@@ -51,8 +88,8 @@ export default function CartPage() {
       
       {/* Cart items */}
       <div className="divide-y">
-        {items.map((item) => (
-          <div key={item.product} className="grid grid-cols-1 md:grid-cols-12 py-6 items-center gap-4">
+        {cart.items.map((item, index) => (
+          <div key={`${item.product}-${index}`} className="grid grid-cols-1 md:grid-cols-12 py-6 items-center gap-4">
             {/* Product info */}
             <div className="col-span-1 md:col-span-6 flex items-center gap-4">
               <div className="relative w-20 h-20 aspect-square rounded bg-muted/20 overflow-hidden">
@@ -74,7 +111,7 @@ export default function CartPage() {
               <Button 
                 variant="ghost" 
                 size="icon"
-                onClick={() => removeItem(item.product)}
+                onClick={() => handleRemoveItem(item.product)}
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -92,19 +129,25 @@ export default function CartPage() {
                   variant="ghost" 
                   size="icon"
                   className="h-8 w-8 rounded-none"
-                  onClick={() => updateQuantity(item.product, Math.max(1, item.quantity - 1))}
+                  onClick={() => handleUpdateQuantity(item.product, Math.max(1, item.quantity - 1))}
                   disabled={item.quantity <= 1}
                 >
                   <Minus className="h-3 w-3" />
                 </Button>
-                <div className="w-10 h-8 flex items-center justify-center text-sm">
-                  {item.quantity}
-                </div>
+                
+                <Input
+  type="number"
+  min="1"
+  value={item.quantity}
+  onChange={(e) => handleQuantityChange(e, item.product)}
+  className="w-12 h-8 text-center border-none focus:ring-0 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+/>
+                
                 <Button 
                   variant="ghost" 
                   size="icon"
                   className="h-8 w-8 rounded-none"
-                  onClick={() => updateQuantity(item.product, item.quantity + 1)}
+                  onClick={() => handleUpdateQuantity(item.product, item.quantity + 1)}
                 >
                   <Plus className="h-3 w-3" />
                 </Button>
@@ -127,13 +170,13 @@ export default function CartPage() {
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Tạm tính</span>
-              <span>{formatPrice(totalAmount)}</span>
+              <span>{formatPrice(cart.totalAmount)}</span>
             </div>
             
             <div className="border-t pt-2 mt-2">
               <div className="flex justify-between font-medium">
                 <span>Tổng cộng</span>
-                <span>{formatPrice(totalAmount)}</span>
+                <span>{formatPrice(cart.totalAmount)}</span>
               </div>
             </div>
           </div>

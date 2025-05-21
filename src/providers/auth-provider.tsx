@@ -2,15 +2,18 @@
 
 import { useEffect } from "react";
 import { useAuthStore } from "@/store/use-auth-store";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import authService from "@/lib/api/services/auth-service";
 import { PropsWithChildren } from "react";
+import { useCartStore } from "@/store/cart-store";
+import { cartService } from "@/lib/api/services/cart-service";
+import { CART_QUERY_KEY } from "@/hooks/queries/cart/use-cart";
 
-//chuyển hướng hoặc load lại trang nhờ AuthProvider check xem người udngf danh oh 
 export function AuthProvider({ children }: PropsWithChildren) {
   const { setUser, user } = useAuthStore();
+  const cartStore = useCartStore();
+  const queryClient = useQueryClient();
 
-  // Hàm để lấy refresh token từ cookies
   const getRefreshTokenFromCookies = () => {
     return document.cookie
       .split("; ")
@@ -18,31 +21,51 @@ export function AuthProvider({ children }: PropsWithChildren) {
       ?.split("=")[1] || "";
   };
 
-  // Query để kiểm tra người dùng hiện tại
   const { data: authData } = useQuery({
     queryKey: ['auth-check'],
     queryFn: async () => {
       try {
         const response = await authService.getMe();
+        
+        if (!response?.data) {
+          return null;
+        }
 
-        // Lấy refresh token hiện tại từ cookies
         const currentRefreshToken = getRefreshTokenFromCookies();
 
-        // Kiểm tra xem response có phải từ refresh token không
-        if (response.data?.accessToken && !response.data?.user) {
-          // Nếu là response từ refresh token, chỉ cập nhật access token
-          if (user) {
-            // Giữ nguyên refresh token hiện tại trong cookies
-            setUser(user, response.data.accessToken, currentRefreshToken);
-          }
+        if (response.data.accessToken && !response.data.user && user) {
+          setUser(user, response.data.accessToken, currentRefreshToken);
           return response.data;
         }
 
-        // Nếu là response từ getMe
-        if (response.data?.user) {
+        if (response.data.user) {
           const { user: userData, accessToken } = response.data;
-          // Giữ nguyên refresh token hiện tại trong cookies
-          setUser(userData, accessToken, currentRefreshToken);
+          
+          await setUser(userData, accessToken, currentRefreshToken);
+          
+          if (cartStore.items.length > 0) {
+            try {
+              // Sync cart từ store lên server
+              await cartStore.syncCartWithServer();
+              
+              // Fetch cart data mới từ server
+              const newCart = await cartService.getCart();
+              
+              // Update cart data trong react-query cache
+              queryClient.setQueryData(CART_QUERY_KEY, newCart);
+            } catch (error) {
+              console.error("Lỗi khi sync cart:", error);
+            }
+          } else {
+            // Nếu không có items trong store, vẫn fetch cart từ server
+            try {
+              const cart = await cartService.getCart();
+              queryClient.setQueryData(CART_QUERY_KEY, cart);
+            } catch (error) {
+              console.error("Lỗi khi fetch cart:", error);
+            }
+          }
+
           return response.data;
         }
 
@@ -60,5 +83,3 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   return <>{children}</>;
 }
-
-//quản lý trạng thái trong suốt ứng dụng, giải quyết refreshToken nếu cầncần

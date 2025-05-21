@@ -3,14 +3,13 @@ import axios from "axios";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
-//them token vao header 
 export const axiosInstance = axios.create({
   baseURL: API_URL,
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
   },
-  withCredentials: true, // Giữ lại withCredentials cho các request thông thường
+  withCredentials: true,
 });
 
 const NO_REFRESH_ENDPOINTS = [
@@ -19,13 +18,16 @@ const NO_REFRESH_ENDPOINTS = [
   "/auth/refresh-token"
 ];
 
-// Gắn accessToken lấy từ ram vào header cho mỗi request
+// Gắn accessToken vào header cho mỗi request
 axiosInstance.interceptors.request.use(
   (config) => {
     const accessToken = useAuthStore.getState().accessToken;
+    console.log('Current access token:', accessToken); // Debug token
+    
     if (accessToken) {
       config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${accessToken}`;
+      console.log('Request headers:', config.headers); // Debug headers
     }
     return config;
   },
@@ -48,7 +50,6 @@ const processQueue = (error: unknown | null, token: string | null = null) => {
   failedQueue = [];
 };
 
-// Xử lý refresh token khi token hết hạn
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -58,12 +59,10 @@ axiosInstance.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    // Không retry cho các endpoints liên quan đến auth
     if (NO_REFRESH_ENDPOINTS.some(endpoint => originalRequest.url?.includes(endpoint))) {
       return Promise.reject(error);
     }
 
-    // Xử lý refresh token khi gặp lỗi 401
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
@@ -80,7 +79,6 @@ axiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        // Lấy refresh token từ cookies
         const cookies = document.cookie.split(';').reduce((acc, cookie) => {
           const [key, value] = cookie.trim().split('=');
           acc[key] = value;
@@ -105,12 +103,10 @@ axiosInstance.interceptors.response.use(
           }
         );
 
-        // Kiểm tra response và lấy access token mới
         const newAccessToken = response.data?.accessToken;
         if (!newAccessToken) {
           throw new Error("Invalid refresh token response");
         }
-
 
         // Cập nhật token cho request hiện tại và các request trong hàng đợi
         axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${newAccessToken}`;
@@ -120,7 +116,7 @@ axiosInstance.interceptors.response.use(
         return axiosInstance(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
-        localStorage.removeItem("access_token");
+        useAuthStore.getState().logout(); // Logout nếu refresh token fail
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
