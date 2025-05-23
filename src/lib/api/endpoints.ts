@@ -48,13 +48,14 @@ export const API_ENDPOINTS = {
     REMOVE: (id: string) => `/cart/${id}`,
     CLEAR: "/cart/clear",
     SYNC: "/cart/sync",
-    
   },
 
-  ORDER:{
+  ORDER: {
     BASE: "/order/",
+    LIST: "/order/",
     CREATE: "/order/",
-    CANCEL: (id: string) => `/cancel/${id}`,
-    
-  }
+    DETAIL: (id: string) => `/order/${id}`,
+    CANCEL: (id: string) => `/order/${id}/cancel`,
+},
+
 }as const

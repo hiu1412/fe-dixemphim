@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { cartService } from '@/lib/api/services/cart-service';
 import { useCartStore } from '@/store/cart-store';
 import { useAuth } from '@/hooks/auth/use-auth';
 import { isValidObjectId } from '@/lib/utils';
+import { toast } from 'sonner';
+import { Cart } from '@/lib/api/types';
 
 export const CART_QUERY_KEY = ['cart'] as const;
+const TOAST_DURATION = 1500; // 1.5 seconds
 
 export const useCart = () => {
   const queryClient = useQueryClient();
@@ -24,85 +27,104 @@ export const useCart = () => {
   };
 
   // Query để fetch cart data từ server (chỉ khi đã login)
-  const { data: serverCart } = useQuery({
+  const { data: serverCart, refetch: refetchCart } = useQuery({
     queryKey: CART_QUERY_KEY,
     queryFn: cartService.getCart,
     enabled: isAuthenticated,
     staleTime: 1000 * 60
   });
 
-  // Mutation cho update cart với Optimistic Updates
+  // Effect để theo dõi thay đổi của cartStore và cập nhật React Query cache
+  useEffect(() => {
+    if (isAuthenticated && serverCart) {
+      queryClient.setQueryData(CART_QUERY_KEY, cartStore);
+    }
+  }, [cartStore.items, isAuthenticated, serverCart, queryClient]);
+
+  // Mutation cho update cart
   const { mutate: updateCart } = useMutation({
     mutationFn: async ({ productId, quantity }: { productId: any; quantity: number }) => {
       // Chuẩn hóa productId
       const productIdStr = getProductId(productId);
       
-      console.log('useCart - Updating cart:', {
-        original: productId,
-        normalized: productIdStr,
-        quantity
-      });
-      
       if (!productIdStr || !isValidObjectId(productIdStr)) {
-        console.error('useCart - Invalid productId:', productId);
         throw new Error('Invalid product ID format');
       }
 
-      return cartService.updateCartItem(productIdStr, quantity);
+      if (!isAuthenticated) {
+        // Nếu không đăng nhập, cập nhật trực tiếp vào cartStore
+        await cartStore.updateQuantity(productIdStr, quantity);
+        return cartStore;
+      }
+
+      // Nếu đã đăng nhập, gọi API và cập nhật store
+      const result = await cartService.updateCartItem(productIdStr, quantity);
+      cartStore.updateCartFromServer(result);
+      return result;
     },
     
     onMutate: async ({ productId, quantity }) => {
       // Chuẩn hóa productId
       const productIdStr = getProductId(productId);
       
-      if (!isAuthenticated) {
-        cartStore.updateQuantity(productIdStr, quantity);
-        return;
-      }
-
       await queryClient.cancelQueries({ queryKey: CART_QUERY_KEY });
       const previousCart = queryClient.getQueryData(CART_QUERY_KEY);
 
-      queryClient.setQueryData(CART_QUERY_KEY, (old: any) => {
-        if (!old || !old.items) {
-          console.warn('useCart - Old data missing or invalid');
-          return old;
-        }
+      // Lưu trữ state hiện tại của cartStore
+      const previousCartStore = {
+        _id: cartStore._id,
+        user: cartStore.user,
+        items: [...cartStore.items],
+        totalAmount: cartStore.totalAmount,
+        createdAt: cartStore.createdAt,
+        updatedAt: cartStore.updatedAt
+      };
 
-        // Xử lý cả trường hợp item.product là object hoặc string
+      // Optimistic update cho cả local và server state
+      queryClient.setQueryData(CART_QUERY_KEY, (old: any) => {
+        if (!old || !old.items) return old;
+
         const updatedItems = old.items.map((item: any) => {
           const itemProductId = getProductId(item.product);
           return itemProductId === productIdStr ? { ...item, quantity } : item;
         });
         
-        return {
+        const updatedCart = {
           ...old,
           items: updatedItems,
           totalAmount: updatedItems.reduce((total: number, item: any) => 
             total + (item.price * item.quantity), 0
           )
         };
+
+        return updatedCart;
       });
 
-      return { previousCart };
+      return { previousCart, previousCartStore };
     },
     
     onError: (err, variables, context) => {
+      toast.error('Lỗi khi cập nhật giỏ hàng', { duration: TOAST_DURATION });
       console.error('useCart - Update error:', err);
+
       if (isAuthenticated && context?.previousCart) {
         queryClient.setQueryData(CART_QUERY_KEY, context.previousCart);
+      } else if (!isAuthenticated && context?.previousCartStore) {
+        // Khôi phục state của cartStore
+        cartStore.updateCartFromServer(context.previousCartStore);
       }
     },
     
     onSuccess: (data) => {
-      console.log('useCart - Update success:', data);
+      toast.success('Cập nhật giỏ hàng thành công', { duration: TOAST_DURATION });
       if (isAuthenticated) {
-        queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY });
+        refetchCart();
       }
+      queryClient.setQueryData(CART_QUERY_KEY, data);
     }
   });
 
-  // Thêm mutation cho xóa sản phẩm khỏi giỏ hàng
+  // Mutation cho xóa sản phẩm khỏi giỏ hàng
   const { mutate: removeCart } = useMutation({
     mutationFn: async (productId: any) => {
       const productIdStr = getProductId(productId);
@@ -110,21 +132,36 @@ export const useCart = () => {
       if (!productIdStr || !isValidObjectId(productIdStr)) {
         throw new Error('Invalid product ID format for removal');
       }
+
+      if (!isAuthenticated) {
+        // Nếu không đăng nhập, xóa trực tiếp từ cartStore
+        await cartStore.removeItem(productIdStr);
+        return cartStore;
+      }
       
-      return cartService.removeCartItem(productIdStr);
+      // Nếu đã đăng nhập, gọi API và cập nhật store
+      const result = await cartService.removeCartItem(productIdStr);
+      cartStore.updateCartFromServer(result);
+      return result;
     },
     
     onMutate: async (productId) => {
       const productIdStr = getProductId(productId);
       
-      if (!isAuthenticated) {
-        cartStore.removeItem(productIdStr);
-        return;
-      }
-
       await queryClient.cancelQueries({ queryKey: CART_QUERY_KEY });
       const previousCart = queryClient.getQueryData(CART_QUERY_KEY);
 
+      // Lưu trữ state hiện tại của cartStore
+      const previousCartStore = {
+        _id: cartStore._id,
+        user: cartStore.user,
+        items: [...cartStore.items],
+        totalAmount: cartStore.totalAmount,
+        createdAt: cartStore.createdAt,
+        updatedAt: cartStore.updatedAt
+      };
+
+      // Optimistic update
       queryClient.setQueryData(CART_QUERY_KEY, (old: any) => {
         if (!old || !old.items) return old;
 
@@ -133,35 +170,45 @@ export const useCart = () => {
           return itemProductId !== productIdStr;
         });
         
-        return {
+        const updatedCart = {
           ...old,
           items: updatedItems,
           totalAmount: updatedItems.reduce((total: number, item: any) => 
             total + (item.price * item.quantity), 0
           )
         };
+
+        return updatedCart;
       });
 
-      return { previousCart };
+      return { previousCart, previousCartStore };
     },
     
     onError: (err, variables, context) => {
+      toast.error('Lỗi khi xóa sản phẩm khỏi giỏ hàng', { duration: TOAST_DURATION });
       console.error('useCart - Remove error:', err);
+
       if (isAuthenticated && context?.previousCart) {
         queryClient.setQueryData(CART_QUERY_KEY, context.previousCart);
+      } else if (!isAuthenticated && context?.previousCartStore) {
+        // Khôi phục state của cartStore
+        cartStore.updateCartFromServer(context.previousCartStore);
       }
     },
     
-    onSuccess: () => {
+    onSuccess: (data) => {
+      toast.success('Đã xóa sản phẩm khỏi giỏ hàng', { duration: TOAST_DURATION });
       if (isAuthenticated) {
-        queryClient.invalidateQueries({ queryKey: CART_QUERY_KEY });
+        refetchCart();
       }
+      queryClient.setQueryData(CART_QUERY_KEY, data);
     }
   });
 
   return {
     cart: isAuthenticated ? serverCart : cartStore,
     updateCart,
-    removeCart
+    removeCart,
+    refetchCart
   };
 };

@@ -8,11 +8,32 @@ import { Button } from "../ui/button";
 import { UserButton } from "./user-button";
 import { SearchIcon, ShoppingCart } from "lucide-react";
 import { useCartStore } from "@/store/cart-store";
+import { useEffect, useState } from "react";
 
 export function Header() {
   const { isAuthenticated, logout, user } = useAuth();
-  const cartItemsCount = useCartStore(state => state.getItemsCount());
+  const cartStore = useCartStore();
+  const [cartCount, setCartCount] = useState(0);
 
+  // Theo dõi thay đổi của giỏ hàng và cập nhật số lượng
+  useEffect(() => {
+    const updateCartCount = () => {
+      const count = cartStore.getItemsCount();
+      setCartCount(count);
+    };
+
+    // Cập nhật lần đầu
+    updateCartCount();
+
+    // Đăng ký listener cho các thay đổi của store
+    const unsubscribe = useCartStore.subscribe((state) => {
+      updateCartCount();
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [cartStore]);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -37,9 +58,9 @@ export function Header() {
             <Button variant="ghost" size="icon" className="hidden md:flex relative" asChild>
               <Link href="/cart">
                 <ShoppingCart className="h-5 w-5" />
-                {cartItemsCount > 0 && (
+                {cartCount > 0 && (
                   <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {cartItemsCount}
+                    {cartCount}
                   </span>
                 )}
               </Link>

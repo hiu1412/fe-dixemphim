@@ -74,7 +74,7 @@ export default function CartItem({ item, onUpdateQuantity, onRemoveItem }: CartI
           </Button>
           
           <Input
-            type="number"
+            type="number" 
             min="1"
             value={item.quantity}
             onChange={handleQuantityChange}
