@@ -1,6 +1,7 @@
 import React from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-interface PaginationProps { 
+interface PaginationProps {
   currentPage: number; 
   totalPages: number; 
   onPageChange: (page: number) => void;
@@ -61,48 +62,53 @@ export function Pagination({
   const pageNumbers = getPageNumbers();
   
   return (
-    <nav className="flex items-center space-x-1">
+    <nav className="flex items-center space-x-2">
       <button
         onClick={() => onPageChange(Math.max(1, currentPage - 1))}
         disabled={currentPage === 1}
-        className={`px-3 py-1 rounded border ${
-          currentPage === 1 
-            ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-            : 'hover:bg-gray-100'
+        className={`min-w-[85px] px-3 py-1.5 text-sm rounded-md border flex items-center justify-center gap-1 ${
+          currentPage === 1
+            ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
+            : 'hover:bg-gray-50 active:bg-gray-100 transition-colors'
         }`}
       >
-        Trước
+        <ChevronLeft className="h-4 w-4" />
+        <span>Trước</span>
       </button>
       
-      {pageNumbers.map((page, index) => (
-        <React.Fragment key={index}>
-          {page === '...' ? (
-            <span className="px-3 py-1">...</span>
-          ) : (
-            <button
-              onClick={() => typeof page === 'number' && onPageChange(page)}
-              className={`px-3 py-1 rounded border ${
-                currentPage === page
-                  ? 'bg-blue-500 text-white border-blue-500' 
-                  : 'hover:bg-gray-100'
-              }`}
-            >
-              {page}
-            </button>
-          )}
-        </React.Fragment>
-      ))}
-      
+      {/* Centered page numbers */}
+      <div className="flex items-center space-x-1">
+        {pageNumbers.map((page, index) => (
+          <React.Fragment key={index}>
+            {page === '...' ? (
+              <span className="px-3 py-1.5">...</span>
+            ) : (
+              <button
+                onClick={() => typeof page === 'number' && onPageChange(page)}
+                className={`min-w-[40px] px-3 py-1.5 text-sm rounded-md border ${
+                  currentPage === page
+                    ? 'bg-primary text-primary-foreground border-primary hover:bg-primary/90'
+                    : 'hover:bg-gray-50 active:bg-gray-100 transition-colors'
+                }`}
+              >
+                {page}
+              </button>
+            )}
+          </React.Fragment>
+        ))}
+      </div>
+
       <button
         onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
         disabled={currentPage === totalPages}
-        className={`px-3 py-1 rounded border ${
-          currentPage === totalPages 
-            ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-            : 'hover:bg-gray-100'
+        className={`min-w-[85px] px-3 py-1.5 text-sm rounded-md border flex items-center justify-center gap-1 ${
+          currentPage === totalPages
+            ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
+            : 'hover:bg-gray-50 active:bg-gray-100 transition-colors'
         }`}
       >
-        Tiếp
+        <span>Tiếp</span>
+        <ChevronRight className="h-4 w-4" />
       </button>
     </nav>
   );

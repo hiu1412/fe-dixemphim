@@ -1,21 +1,9 @@
 import { AxiosResponse } from 'axios';
 import { axiosInstance } from './axios-instance';
 import { API_ENDPOINTS } from './endpoints';
-import { ApiResponse, User, UserFilters } from './types';
+import { ApiResponse, User, UserFilters, UsersListResponse } from './types';
 
-interface UsersResponse {
-  status: 'success' | 'error';
-  message: string;
-  data: {
-    items: User[];
-    pagination: {
-      total: number;
-      page: number;
-      limit: number;
-      totalPages: number;
-    }
-  }
-}
+interface UsersResponse extends ApiResponse<string, UsersListResponse> {}
 
 export const adminApi = {
   // User endpoints

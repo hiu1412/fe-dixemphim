@@ -50,6 +50,24 @@ export interface UserFilters extends BaseFilters{
   active?: boolean;  // Trạng thái hoạt động
 }
 
+export interface UsersListResponse {
+  items: User[];
+  total: number;
+  page: number;
+  totalPages: number;
+}
+
+export interface ApiUser {
+  _id: string;
+  username: string;
+  email: string;
+  role: string;
+  active: boolean;
+  created_at?: string;
+  updated_at?: string;
+  email_verified_at?: string | null;
+}
+
   export interface Product {
   _id: string;
   name: string;

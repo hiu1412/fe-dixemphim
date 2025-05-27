@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminApi } from '@/lib/api/admin';
-import { UserFilters, User } from '@/lib/api/types';
+import { UserFilters, User, ApiResponse, UsersListResponse } from '@/lib/api/types';
 import { toast } from "sonner"; // Thay đổi import từ useToast sang toast từ sonner
 
 // Key cho cache queries
@@ -12,11 +12,11 @@ export const USER_QUERY_KEYS = {
 
 // Lấy danh sách users với filters
 export function useUserList(filters: UserFilters = {}) {
-  return useQuery({
+  return useQuery<UsersListResponse>({
     queryKey: USER_QUERY_KEYS.USER_FILTERS(filters),
     queryFn: async () => {
       const result = await adminApi.getUsers(filters);
-      return result; // Trả về dữ liệu gốc từ API
+      return result;
     },
     staleTime: 5 * 60 * 1000, // 5 phút
   });
