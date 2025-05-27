@@ -15,7 +15,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Movies", href: "/dashboard/movies" },
+  { name: "Sản phẩm", href: "/dashboard/movies" },
  
   { name: "Users", href: "/dashboard/users", icon: Users },
 ];

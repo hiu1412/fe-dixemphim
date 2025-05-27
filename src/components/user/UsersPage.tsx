@@ -11,6 +11,7 @@ import { UserTable } from "./components/UserTable";
 import { UserPagination } from "./components/UserPagination";
 import { ViewUserDialog } from "./components/ViewUserDialog";
 import { DeleteUserDialog } from "./components/DeleteUserDialog";
+import { EditUserDialog } from "./components/EditUserDialog";
 
 interface UsersPageProps {
   initialPage?: number;
@@ -26,6 +27,7 @@ export default function UsersPage({ initialPage = 1 }: UsersPageProps) {
   const [selectedUser, setSelectedUser] = useState<ApiUser| null>(null);
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
   const defaultFilters: UserFiltersType = {
@@ -96,6 +98,10 @@ export default function UsersPage({ initialPage = 1 }: UsersPageProps) {
           setSelectedUser(user);
           setIsViewOpen(true);
         }}
+        onEditUser={(user) => {
+          setSelectedUser(user);
+          setIsEditOpen(true);
+        }}
         onDeleteUser={(user) => {
           setSelectedUser(user);
           setIsDeleteOpen(true);
@@ -123,6 +129,12 @@ export default function UsersPage({ initialPage = 1 }: UsersPageProps) {
         user={selectedUser}
         open={isDeleteOpen}
         onOpenChange={setIsDeleteOpen}
+      />
+
+      <EditUserDialog
+        user={selectedUser}
+        open={isEditOpen}
+        onOpenChange={setIsEditOpen}
       />
     </div>
   );

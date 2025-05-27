@@ -1,7 +1,8 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Check, Eye, MoreVertical, Trash2, X } from "lucide-react";
+import { useState } from "react";
+import { Check, Edit2, Eye, MoreVertical, Trash2, X } from "lucide-react";
 import { RoleBadge, StatusBadge } from "./UserBadges";
 import { useToggleUserStatus } from "@/hooks/queries/user/user-list";
 import { toast } from "sonner";
@@ -12,6 +13,7 @@ interface UserTableProps {
   isLoading: boolean;
   isError: boolean;
   onViewUser: (user: ApiUser) => void;
+  onEditUser: (user: ApiUser) => void;
   onDeleteUser: (user: ApiUser) => void;
 }
 
@@ -30,8 +32,9 @@ const formatDate = (dateString?: string) => {
   }
 };
 
-export const UserTable = ({ users, isLoading, isError, onViewUser, onDeleteUser }: UserTableProps) => {
+export const UserTable = ({ users, isLoading, isError, onViewUser, onEditUser, onDeleteUser }: UserTableProps) => {
   const toggleUserStatus = useToggleUserStatus();
+  const [dropdownId, setDropdownId] = useState<string | null>(null);
 
   const handleToggleStatus = (userId: string, isActive: boolean) => {
     toggleUserStatus.mutate(
@@ -39,12 +42,28 @@ export const UserTable = ({ users, isLoading, isError, onViewUser, onDeleteUser 
       {
         onSuccess: () => {
           toast.success(`Người dùng đã ${isActive ? "bị khóa" : "được kích hoạt"}`);
+          setDropdownId(null); // Đóng dropdown
         },
         onError: () => {
           toast.error("Không thể thay đổi trạng thái người dùng");
         }
       }
     );
+  };
+
+  const handleViewUser = (user: ApiUser) => {
+    onViewUser(user);
+    setDropdownId(null); // Đóng dropdown
+  };
+
+  const handleDeleteUser = (user: ApiUser) => {
+    onDeleteUser(user);
+    setDropdownId(null); // Đóng dropdown
+  };
+
+  const handleEditUser = (user: ApiUser) => {
+    onEditUser(user);
+    setDropdownId(null); // Đóng dropdown
   };
 
   return (
@@ -101,7 +120,10 @@ export const UserTable = ({ users, isLoading, isError, onViewUser, onDeleteUser 
                   {user.created_at ? formatDate(user.created_at) : '-'}
                 </TableCell>
                 <TableCell>
-                  <DropdownMenu>
+                  <DropdownMenu
+                    open={dropdownId === user._id}
+                    onOpenChange={(open) => setDropdownId(open ? user._id : null)}
+                  >
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon" className="h-8 w-8">
                         <MoreVertical className="h-4 w-4" />
@@ -111,9 +133,13 @@ export const UserTable = ({ users, isLoading, isError, onViewUser, onDeleteUser 
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Hành động</DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => onViewUser(user)}>
+                      <DropdownMenuItem onClick={() => handleViewUser(user)}>
                         <Eye className="mr-2 h-4 w-4" />
                         Xem chi tiết
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleEditUser(user)}>
+                        <Edit2 className="mr-2 h-4 w-4" />
+                        Chỉnh sửa
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleToggleStatus(user._id, user.active)}>
                         {user.active ? (
@@ -128,9 +154,9 @@ export const UserTable = ({ users, isLoading, isError, onViewUser, onDeleteUser 
                           </>
                         )}
                       </DropdownMenuItem>
-                      <DropdownMenuItem 
+                      <DropdownMenuItem
                         className="text-destructive focus:text-destructive"
-                        onClick={() => onDeleteUser(user)}
+                        onClick={() => handleDeleteUser(user)}
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Xóa
