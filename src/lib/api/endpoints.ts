@@ -14,7 +14,7 @@ export const API_ENDPOINTS = {
 
   // User endpoints
   USERS: {
-    BASE: "/user/",
+    BASE: "/user",
     DETAIL: (id: string) => `/user/${id}`,
     UPDATE: (id: string) => `/user/${id}`,
     DELETE: (id: string) => `/user/${id}`,

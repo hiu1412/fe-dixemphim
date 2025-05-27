@@ -27,14 +27,28 @@ export interface AuthResponse {
 }
 
 export interface User {
-    id: string;
+    _id: string;
     username: string;
     email: string;
     email_verified_at: string | null;
     role: "admin" | "user";
+    active: boolean;
     created_at: string;
     updated_at: string;
   }
+
+  //kiểu dữ liệu cần thiết gồm phân trang, tìm kiếm, sắp xếp
+export interface BaseFilters {
+  search?: string;    // Tìm kiếm theo tên/email
+  page?: number;      // Số trang hiện tại
+  limit?: number;     // Số người dùng trên mỗi trang
+  sortBy?: string;    // Sắp xếp (ví dụ: "createAt:desc")
+}
+//đối với User
+export interface UserFilters extends BaseFilters{
+  role?: "admin" | "user" |  string;     // Vai trò (admin/user)
+  active?: boolean;  // Trạng thái hoạt động
+}
 
   export interface Product {
   _id: string;

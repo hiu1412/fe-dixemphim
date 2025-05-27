@@ -55,18 +55,8 @@ export default function DashboardPage() {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
 
-  const { data: stats } = useQuery({
-    queryKey: ["admin-stats"],
-    queryFn: () => adminApi.getStats(),
-  });
-
-  const defaultStats = {
-    totalMovies: 0,
-  };
-
-  const {
-    totalMovies,
-  } = stats?.data || defaultStats;
+  
+ 
 
   const handleLogout = () => {
     logout();
@@ -112,13 +102,7 @@ export default function DashboardPage() {
           Thật quý hóa khi ngài ghé thăm trang quản trị, hôm nay có vẻ sẽ là một ngày đẹp trời
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <StatCard
-            title="Tổng số phim"
-            value={totalMovies}
-            trend={{ value: 12, isUp: true }}
-          /> 
-        </div>
+       
       </div>
     </div>
   );
