@@ -5,6 +5,5 @@ export const useArtist = () => {
   return useQuery({
     queryKey: ["artists"],
     queryFn: artistService.list,
-    
   });
 };

@@ -1,6 +1,6 @@
 "use client";
-import Link from "next/link";
 import { useArtist } from "@/hooks/queries/artist/use-list";
+import Link from "next/link";
 
 export default function ArtistList() {
     const { data, isLoading, error } = useArtist();

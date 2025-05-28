@@ -58,4 +58,12 @@ export const API_ENDPOINTS = {
     CANCEL: (id: string) => `/order/${id}/cancel`,
 },
 
-}as const
+  GENRE: {
+    BASE: "/genre/",
+    LIST: "/genre/",
+    DETAIL: (id: string) => `/genre/${id}`,
+    CREATE: "/genre/",
+    UPDATE: (id: string) => `/genre/${id}`,
+    DELETE: (id: string) => `/genre/${id}`,
+  },
+} as const

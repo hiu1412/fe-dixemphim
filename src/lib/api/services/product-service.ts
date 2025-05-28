@@ -1,11 +1,21 @@
 import { axiosInstance } from "../axios-instance";
 import { API_ENDPOINTS } from "../endpoints";
-import { Product } from "../types";
+import { Product, ProductFilters, ProductListResponse } from "../types";
 
 export const productService = {
   // Lấy danh sách sản phẩm
-  list: async (): Promise<Product[]> => {
-    const res = await axiosInstance.get<Product[]>(API_ENDPOINTS.PRODUCT.LIST);
+  list: async (filters?: ProductFilters): Promise<ProductListResponse> => {
+    const params = new URLSearchParams();
+    if (filters) {
+      if (filters.page) params.append('page', filters.page.toString());
+      if (filters.limit) params.append('limit', filters.limit.toString());
+      if (filters.search) params.append('search', filters.search);
+      if (filters.sortBy) params.append('sortBy', filters.sortBy);
+    }
+
+    const res = await axiosInstance.get<ProductListResponse>(
+      `${API_ENDPOINTS.PRODUCT.LIST}?${params.toString()}`
+    );
     return res.data;
   },
 

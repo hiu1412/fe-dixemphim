@@ -6,6 +6,7 @@ import { useCartStore } from "@/store/cart-store";
 import { useState } from "react";
 import { toast } from "sonner";
 import Link from "next/link";
+import { Product, Artist } from "@/lib/api/types";
 
 export default function ProductList() {
   const { data, isLoading, error } = useProducts();
@@ -15,7 +16,7 @@ export default function ProductList() {
   if (isLoading) return <div>Đang tải...</div>;
   if (error) return <div>Lỗi: {(error as Error).message}</div>;
 
-  const handleAddToCart = (product: any) => {
+  const handleAddToCart = (product: Product) => {
     console.log("Adding product to cart:", product);
     
     // Thêm sản phẩm vào giỏ hàng
@@ -35,7 +36,7 @@ export default function ProductList() {
     }, 1500);
   };
 
-  const handleToggleCart = (product: any) => {
+  const handleToggleCart = (product: Product) => {
     // Nếu sản phẩm đã có trong giỏ hàng, xóa ra, ngược lại thì thêm vào
     if (isItemInCart(product._id)) {
       removeItem(product._id);
@@ -49,7 +50,7 @@ export default function ProductList() {
     <div>
       <h2 className="text-2xl font-bold mb-6">Danh sách sản phẩm</h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
-        {data?.map((product) => {
+        {data?.data?.map((product: Product) => {
           // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
           const isInCart = isItemInCart(product._id);
           // Kiểm tra xem đang có animation thêm vào giỏ không
@@ -112,7 +113,7 @@ export default function ProductList() {
                 <div className="font-semibold text-base truncate">{product.name}</div>
                 <div className="text-xs text-muted-foreground truncate">
                   {product.artists
-                    ?.map((artist) => typeof artist === "string" ? artist : artist.name)
+                    ?.map((artist: string | Artist) => typeof artist === "string" ? artist : artist.name)
                     .join(", ")
                   }
                 </div>

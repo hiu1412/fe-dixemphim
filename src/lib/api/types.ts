@@ -68,7 +68,23 @@ export interface ApiUser {
   email_verified_at?: string | null;
 }
 
-  export interface Product {
+export interface ProductFilters extends BaseFilters {
+  // Có thể thêm các filter đặc biệt cho product nếu cần
+}
+
+export interface ProductListResponse {
+  status: "success" | "error";
+  message?: string;
+  data: Product[];
+  pagination: {
+    total: number; // Tổng số sản phẩm
+    page: number; // Trang hiện tại
+    limit: number; // Số sản phẩm mỗi trang
+    totalPages: number; // Tổng số trang
+  };
+}
+
+export interface Product {
   _id: string;
   name: string;
   image: string;
@@ -79,6 +95,13 @@ export interface ApiUser {
   genres: string[];  
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Genre {
+  _id: string;
+  name: string;
+  createAt?: Date;
+  updateAt?: Date;
 }
 
 export interface Artist {

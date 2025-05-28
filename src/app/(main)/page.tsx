@@ -5,23 +5,23 @@ const carouselSlides = [
   {
     id: 1,
     imageUrl:
-      "https://i.pinimg.com/736x/7f/40/14/7f40147f3b0b18d754e0308b82ea7e02.jpg",
+      "https://i.pinimg.com/736x/d1/51/f1/d151f1454bea00d37d2b5f7b653cb15c.jpg",
     title: "Âm nhạc luôn trong tim",
     description: "Âm nhạc kết nối mọi người lại với nhau",
   },
   {
     id: 2,
     imageUrl:
-      "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?q=80&w=2070",
-    title: "Ưu đãi Đặc biệt",
-    description: "Giảm giá cho thành viên mới và các suất chiếu sớm",
+      "https://i.pinimg.com/736x/50/fa/ab/50faab807ed7a4765007fdb7a66f8afd.jpg",
+    title: "Ô dé",
+    description: "Đừng cứ mãi chìm đắm, có nhiều thứ ở hiện tại để nhớ",
   },
   {
     id: 3,
     imageUrl:
-      "https://images.unsplash.com/photo-1585647347483-22b66260dfff?q=80&w=2070",
-    title: "Trải nghiệm Thoải mái",
-    description: "Hệ thống rạp hiện đại với ghế ngồi êm ái",
+      "https://i.pinimg.com/736x/af/ed/ca/afedcadfcab0a85f7282b05880865bc2.jpg",
+    title: "Ghé tiệm để mua nhé",
+    description: "Chần chừ gì mà không mua",
   },
 ];
 export default function HomePage() {
